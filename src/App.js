@@ -17,6 +17,9 @@ import rootReducer from './rootReducer';
 import rootSaga from './rootSaga';
 import Courses from './modules/Courses/container';
 import Details from './modules/Details/container';
+import AddCourseScreen from './modules/Courses/components/AddCourse';
+import EditCourseScreen from './modules/Courses/components/EditCourse';
+import ViewCourseScreen from './modules/Courses/components/ViewCourse';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
@@ -39,6 +42,17 @@ const Tabs = createMaterialBottomTabNavigator({
 const Stack = createStackNavigator({
   Home: {
     screen: Tabs,
+  },
+  AddCourse: {
+    screen: AddCourseScreen,
+  },
+  EditCourse: {
+    screen: EditCourseScreen,
+    path: 'course/:id/edit',
+  },
+  ViewCourse: {
+    screen: ViewCourseScreen,
+    path: 'course/:id',
   },
 });
 
