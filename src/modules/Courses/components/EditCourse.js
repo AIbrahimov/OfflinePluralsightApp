@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Text,
   View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { updateCourse } from '../actions';
@@ -16,8 +19,6 @@ export class EditCourse extends React.Component {
       errors: {},
       saving: false,
     };
-    this.saveCourse = this.saveCourse.bind(this);
-    this.updateCourseState = this.updateCourseState.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -26,14 +27,28 @@ export class EditCourse extends React.Component {
     }
   }
 
-  updateCourseState(event) {
-    const field = event.target.name;
-    const { course } = this.state;
-    course[field] = event.target.value;
-    return this.setState({ course });
+  handleTitle = (text) => {
+    const course = { ...this.state.course };
+    course.title = text;
+    this.setState({ course });
   }
 
-  courseFormIsValid() {
+  handleCategory = (text) => {
+    const course = { ...this.state.course };
+    course.category = text;
+    this.setState({ course });
+  }
+
+  saveCourse = () => {
+    if (!this.courseFormIsValid()) {
+      return;
+    }
+
+    this.props.updateCourse(this.state.course);
+    this.redirect();
+  }
+
+  courseFormIsValid = () => {
     let formIsValid = true;
     const errors = {};
 
@@ -46,29 +61,37 @@ export class EditCourse extends React.Component {
     return formIsValid;
   }
 
-  saveCourse(event) {
-    event.preventDefault();
-
-    if (!this.courseFormIsValid()) {
-      return;
-    }
-
-    this.setState({ saving: true });
-    this.props.updateCourse(this.state.course);
-    this.redirect();
-  }
-
-  redirect() {
-    this.setState({ saving: false });
-    this.props.navigation.push('/Courses');
+  redirect = () => {
+    this.props.navigation.push('Home');
   }
 
   render() {
-    const { course } = this.props;
+    const { course } = this.state;
     console.log(course);
     return (
-      <View>
-        <Text>EDIT</Text>
+      <View style={styles.container}>
+        <Text style={styles.courseTitle}>Edit {course.title}</Text>
+        <TextInput
+          style={styles.input}
+          name="title"
+          placeholder="Title"
+          onChangeText={this.handleTitle}
+          value={course.title}
+        />
+        <TextInput
+          style={styles.input}
+          name="category"
+          placeholder="Category"
+          onChangeText={this.handleCategory}
+          value={course.category}
+        />
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={this.saveCourse}
+        >
+          <Text style={styles.submitButtonText}> Submit </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -111,5 +134,29 @@ const mapStateToProps = (state, ownProps) => {
     authors: state.authors.authors,
   };
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  input: {
+    margin: 15,
+    height: 40,
+    borderColor: '#7a42f4',
+    borderWidth: 1,
+  },
+  submitButton: {
+    backgroundColor: '#7a42f4',
+    padding: 10,
+    margin: 15,
+    height: 40,
+  },
+  submitButtonText: {
+    color: 'white',
+  },
+  courseTitle: {
+    marginLeft: 160,
+  },
+});
 
 export default connect(mapStateToProps, ({ updateCourse }))(EditCourse);
